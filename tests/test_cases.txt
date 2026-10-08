@@ -1,0 +1,91 @@
+### 1. Constant arithmetic (folding)
+t1 = 5 + 3
+t2 = t1 * 2
+print(t2)
+--- expect
+t2 = 16
+print(t2)
+
+### 2. Constant propagation (a, b, c are all declared outputs, so all are kept)
+a = 10
+b = a + 5
+c = b * 2
+output a b c
+--- expect
+a = 10
+b = 15
+c = 30
+
+### 3. Dead code (d is never used and is not an output)
+a = 10
+b = 20
+c = a + b
+d = 50
+output c
+--- expect
+c = 30
+
+### 4. Combination of all three (the demo program)
+a = 10
+b = 20
+t1 = a + b
+t2 = t1 * 5
+c = t2
+d = 100
+print(c)
+--- expect
+c = 150
+print(c)
+
+### 5. No optimization possible (x and y are unknown inputs)
+t1 = x + y
+t2 = t1 * x
+print(t2)
+--- expect
+t1 = x + y
+t2 = t1 * x
+print(t2)
+
+### 6. Print preserves needed values (a=5 is printed so it must stay; a=7 is dead)
+a = 5
+print(a)
+a = 7
+b = a + 1
+print(b)
+--- expect
+a = 5
+print(a)
+b = 8
+print(b)
+
+### 7. Mixed known and unknown values (only the known part is optimized)
+k = 4
+m = k * 2
+r = m + x
+unused = r - 1
+print(r)
+--- expect
+r = 8 + x
+print(r)
+
+### 8. Division by zero is NOT folded, integer division truncates
+a = 10
+b = a / 0
+c = 7 / 2
+print(b)
+print(c)
+--- expect
+b = 10 / 0
+c = 3
+print(b)
+print(c)
+
+### 9. Chain of dead code (t1 -> t2 -> t3 are all unused)
+t1 = x + 1
+t2 = t1 * 2
+t3 = t2 - 5
+y = x + 0
+print(y)
+--- expect
+y = x + 0
+print(y)
